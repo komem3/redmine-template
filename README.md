@@ -1,5 +1,9 @@
 # redmine+gcp template
 
+Template to run redmine on gcp
+
+![architecture](./image/redmine_on_gcp.png)
+
 ## Required
 
 - smtp credentials
