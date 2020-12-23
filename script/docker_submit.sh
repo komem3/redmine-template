@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage: ./jdocker_submit.sh $project_id
+# Usage: ./docker_submit.sh $project_id
 
 set -eux
 
