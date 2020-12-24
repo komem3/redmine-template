@@ -8,7 +8,7 @@ cd `dirname $0`
 cd ../
 
 project=$1
-hash=$(git hash-object ./docker/Dockerfile)
+hash=$(./script/directory_hash.sh ./docker)
 
 target="asia-northeast1-docker.pkg.dev/${project}/redmine-repo/redmine:${hash}"
 

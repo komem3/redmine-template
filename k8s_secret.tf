@@ -5,13 +5,8 @@ resource "kubernetes_secret" "redmine_secret" {
   }
 
   data = {
-    redmine_admin = var.redmine_admin
-    redmine_pass  = var.redmine_pass
-    db_pass       = var.db_pass
-    smtp_host     = var.smtp_host
-    smtp_port     = var.smtp_port
-    smtp_user     = var.smtp_user
-    smtp_pass     = var.smtp_pass
+    db_pass    = var.db_pass
+    secret_key = var.secret_key
   }
 
   type = "Opaque"

@@ -8,7 +8,8 @@ Template to run redmine on gcp
 
 - smtp credentials
 - domain
-- toolchain
+- cui tools
+  - git
   - terraform
   - gcloud
   - docker
@@ -24,21 +25,15 @@ $ gcloud config set project ${taget-project}
 2. activate services
 
 ```shell
-$ ./script/activate.sh
+$ ./script/activate.sh ${taget-project}
 ```
 
-3. edit sensitive.tfvars
+3. edit sensitive.tfvars and docker/configuration.yml
 
 - `project_id` project id
 - `db_pass` password of database user used by redmine
-- `project_id` gcp project id
-- `redmine_admin` administor name for redmine
-- `redmine_pass` administor password for redmine
-- `db_pass` database password used by redmine
-- `smtp_host` smtp host
-- `smtp_port` port used for smtp
-- `smtp_user` smtp user
-- `smtp_pass` smtp password
+- `secret_key` used by Rails to encode cookies storing session data
+- `configuration.yml` smtp settings
 
 4. initialize terraform
 
@@ -50,7 +45,7 @@ $ terraform init
 
 ```
 $ terraform apply \
-    -var "docker_tag=$(git hash-object ./docker/Dockerfile)" \
+    -var "docker_tag=$(./script/directory_hash.sh ./docker)" \
     -var-file ./sensitive.tfvars \
     -target google_artifact_registry_repository.redmine_repo
 ```
@@ -58,14 +53,14 @@ $ terraform apply \
 6. build and submit docker
 
 ```
-$ ./docker_submit.sh $project_id
+$ ./script/docker_submit.sh $project_id
 ```
 
 7. run terraform
 
 ```
 $ terraform apply \
-    -var "docker_tag=$(git hash-object ./docker/Dockerfile)" \
+    -var "docker_tag=$(./script/directory_hash.sh ./docker)" \
     -var-file ./sensitive.tfvars \
 ```
 
@@ -86,27 +81,21 @@ spec:
 $ gcloud container clusters get-credentials redmine-cluster --region asia-northeast1
 ```
 
-10. apply backend config (session setting)
+10. apply certificate setting
 
-```shell
-$ kubectl apply -f ./kubectl/redmine_backendconfig.yml
-```
-
-11. create managed certificate
-
-```shell
+```sh
 $ kubectl apply -f ./kubectl/redmine_certificate.yml
 ```
 
-12. check global address
+11. check global address
 
 ```shell
 $ gcloud compute addresses describe redmine-address --global | grep address:
 ```
 
-13. configure the DNS records for your domains to point to the IP address of the load balancer
+12. configure the DNS records for your domains to point to the IP address of the load balancer
 
-14. check certificate status
+13. check certificate status(about 10min)
 
 ```shell
 $ kubectl describe managedcertificate redmine-certificate --namespace redmine-namespace
@@ -119,9 +108,39 @@ Status:
 ...
 ```
 
-15. access your domain
+※ watch command
+
+```shell
+$ kubectl get managedcertificate redmine-certificate --namespace redmine-namespace --watch
+```
+
+14. access your domain
 
 https://yourdomain.example.com
+
+- user: admin
+- password: admin
+
+### option
+
+change ingress healthcheck
+
+1. edit and apply backendconfig
+
+```
+$ kubectl apply -f ./kubectl/backendconfig.yml
+```
+
+2. remove comment out from `k8s_svc.tf`
+
+```tf
+annotations = {
+  "cloud.google.com/neg" = "{\"ingress\": true}"
+  "cloud.google.com/backend-config" = "{\"ports\": {\"8080\": \"redmine-backendconfig\"}}"
+    }
+```
+
+3. terraform apply
 
 ## Recommended settings
 

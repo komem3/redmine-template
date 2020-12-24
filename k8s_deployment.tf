@@ -32,12 +32,17 @@ resource "kubernetes_deployment" "redmine" {
           image_pull_policy = "IfNotPresent"
 
           env {
+            name  = "REDMINE_PLUGINS_MIGRATE"
+            value = true
+          }
+
+          env {
             name  = "REDMINE_DB_POSTGRES"
             value = "127.0.0.1"
           }
 
           env {
-            name  = "REDMINE_DB_NAME"
+            name  = "REDMINE_DB_DATABASE"
             value = google_sql_database.redmine_db.name
           }
 
@@ -47,33 +52,8 @@ resource "kubernetes_deployment" "redmine" {
           }
 
           env {
-            name  = "REDMINE_DB_PORT_NUMBER"
+            name  = "REDMINE_DB_PORT"
             value = 5432
-          }
-
-          env {
-            name  = "REDMINE_LANGUAGE"
-            value = "ja"
-          }
-
-          env {
-            name = "REDMINE_USERNAME"
-            value_from {
-              secret_key_ref {
-                key  = "redmine_admin"
-                name = kubernetes_secret.redmine_secret.metadata.0.name
-              }
-            }
-          }
-
-          env {
-            name = "REDMINE_PASSWORD"
-            value_from {
-              secret_key_ref {
-                key  = "redmine_pass"
-                name = kubernetes_secret.redmine_secret.metadata.0.name
-              }
-            }
           }
 
           env {
@@ -87,40 +67,10 @@ resource "kubernetes_deployment" "redmine" {
           }
 
           env {
-            name = "SMTP_HOST"
+            name = "REDMINE_SECRET_KEY_BASE"
             value_from {
               secret_key_ref {
-                key  = "smtp_host"
-                name = kubernetes_secret.redmine_secret.metadata.0.name
-              }
-            }
-          }
-
-          env {
-            name = "SMTP_PORT"
-            value_from {
-              secret_key_ref {
-                key  = "smtp_port"
-                name = kubernetes_secret.redmine_secret.metadata.0.name
-              }
-            }
-          }
-
-          env {
-            name = "SMTP_USER"
-            value_from {
-              secret_key_ref {
-                key  = "smtp_user"
-                name = kubernetes_secret.redmine_secret.metadata.0.name
-              }
-            }
-          }
-
-          env {
-            name = "SMTP_PASSWORD"
-            value_from {
-              secret_key_ref {
-                key  = "smtp_pass"
+                key  = "secret_key"
                 name = kubernetes_secret.redmine_secret.metadata.0.name
               }
             }
@@ -149,7 +99,7 @@ resource "kubernetes_deployment" "redmine" {
 
           liveness_probe {
             http_get {
-              path = "/"
+              path = "/login"
               port = "redmine-port"
             }
             initial_delay_seconds = 90
@@ -160,7 +110,7 @@ resource "kubernetes_deployment" "redmine" {
           }
           readiness_probe {
             http_get {
-              path = "/"
+              path = "/login"
               port = "redmine-port"
             }
             initial_delay_seconds = 60
@@ -187,7 +137,6 @@ resource "kubernetes_deployment" "redmine" {
             read_only  = false
           }
         }
-
       }
     }
   }

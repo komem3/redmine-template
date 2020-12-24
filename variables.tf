@@ -8,46 +8,15 @@ variable "docker_tag" {
   description = "tag of redmine docker image"
 }
 
-variable "redmine_admin" {
-  type        = string
-  default     = "admin"
-  description = "redmine admin name"
-  sensitive   = true
-}
-
-variable "redmine_pass" {
-  type        = string
-  description = "redmine admin password"
-  sensitive   = true
-}
-
 variable "db_pass" {
   type        = string
   description = "password of user for redmine db"
   sensitive   = true
 }
 
-variable "smtp_host" {
+variable "secret_key" {
   type        = string
-  description = "host of smtp"
-  sensitive   = true
-}
-
-variable "smtp_port" {
-  type        = string
-  description = "port of smtp"
-  sensitive   = true
-}
-
-variable "smtp_user" {
-  type        = string
-  description = "user of smtp"
-  sensitive   = true
-}
-
-variable "smtp_pass" {
-  type        = string
-  description = "password of smtp"
+  description = "used by Rails to encode cookies storing session data"
   sensitive   = true
 }
 

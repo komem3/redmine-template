@@ -1,5 +1,5 @@
 resource "kubernetes_ingress" "redmine_ingress" {
-  depends_on = [google_compute_global_address.redmine_address_ip]
+  depends_on = [google_compute_global_address.redmine_address_ip, kubernetes_service.redmine_svc]
   metadata {
     name      = "redmine-ingress"
     namespace = kubernetes_namespace.redmine.metadata.0.name
@@ -12,8 +12,8 @@ resource "kubernetes_ingress" "redmine_ingress" {
 
   spec {
     backend {
-      service_name = kubernetes_service.redmine_node_port.metadata.0.name
-      service_port = 8080
+      service_name = kubernetes_service.redmine_svc.metadata.0.name
+      service_port = kubernetes_service.redmine_svc.spec.0.port.0.port
     }
   }
 }
