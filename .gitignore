@@ -1,3 +1,5 @@
 /.terraform*
 /terraform.tfstate*
 sensitive.tfvars
+/docker/configuration.yml
+main.tf

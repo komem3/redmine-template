@@ -1,0 +1,12 @@
+default:
+  email_delivery:
+    delivery_method: :smtp
+    smtp_settings:
+      # tls: true # port 465
+      enable_starttls_auto: true
+      address: ""
+      port: 587
+      authentication: :login
+      domain: ""
+      user_name: ""
+      password: ""

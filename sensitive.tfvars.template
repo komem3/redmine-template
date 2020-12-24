@@ -1,13 +1,6 @@
 project_id    = ""
-redmine_admin = ""
-redmine_pass  = ""
 db_pass       = ""
-
-# smtp setting
-smtp_host = ""
-smtp_port = 587
-smtp_user = ""
-smtp_pass = ""
+secret_key = ""
 
 # debug optional
 # production_flag = false

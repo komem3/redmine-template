@@ -8,6 +8,11 @@ resource "google_container_cluster" "redmine" {
     channel = "REGULAR"
   }
 
+  ip_allocation_policy {
+    cluster_ipv4_cidr_block  = "/14"
+    services_ipv4_cidr_block = "/20"
+  }
+
   workload_identity_config {
     identity_namespace = "${var.project_id}.svc.id.goog"
   }

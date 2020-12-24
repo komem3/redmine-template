@@ -27,6 +27,14 @@ resource "google_project_iam_binding" "log_writer_user_iam" {
   ]
 }
 
+resource "google_project_iam_binding" "metatada_writer_user_iam" {
+  project = var.project_id
+  role    = "roles/stackdriver.resourceMetadata.writer"
+  members = [
+    "serviceAccount:${google_service_account.cluster_user.email}",
+  ]
+}
+
 resource "google_service_account" "application_user" {
   account_id   = "gke-application"
   display_name = "GKE Application Account"
